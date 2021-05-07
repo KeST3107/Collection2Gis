@@ -1,8 +1,6 @@
 ﻿namespace Collection2Gis
 {
     using System;
-    using System.Collections.Generic;
-    using System.Timers;
 
     internal class Program
     {
