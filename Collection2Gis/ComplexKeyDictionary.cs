@@ -10,6 +10,10 @@
         private readonly Dictionary<ComplexKey<TId, TName>, TValue> mainDictionary =
             new Dictionary<ComplexKey<TId, TName>, TValue>();
 
+        /// <summary>
+        /// Получение количества значений в коллекции
+        /// </summary>
+        /// <returns>Количество элементов коллекции</returns>
         public int Count() => mainDictionary.Count;
 
         public TValue this[TId id, TName name]
@@ -18,42 +22,68 @@
 
             set => SetValue(new ComplexKey<TId, TName>(id, name), value);
         }
-
+        /// <summary>
+        /// Добавление значения по полному ключу
+        /// </summary>
+        /// <param name="value">Значение с ключем</param>
         public void Add(KeyValuePair<ComplexKey<TId, TName>, TValue> value)
         {
             AddItem(value.Key, value.Value);
         }
-
+        /// <summary>
+        /// Добавление значения по полному ключу
+        /// </summary>
+        /// <param name="complexKey">Ключ</param>
+        /// <param name="value">Значение</param>
         public void Add(ComplexKey<TId, TName> complexKey, TValue value)
         {
             AddItem(complexKey, value);
         }
-
+        /// <summary>
+        /// Очистка коллекции
+        /// </summary>
         public void ClearAll()
         {
             mainDictionary.Clear();
         }
-
+        /// <summary>
+        /// Удаление значения по полному ключу
+        /// </summary>
+        /// <param name="value">Значение с ключем</param>
         public void Remove(KeyValuePair<ComplexKey<TId, TName>, TValue> value)
         {
             RemoveItem(value.Key);
         }
-
+        /// <summary>
+        /// Удаление значения по полному ключу
+        /// </summary>
+        /// <param name="complexKey">Ключ</param>
         public void Remove(ComplexKey<TId, TName> complexKey)
         {
             RemoveItem(complexKey);
         }
-
-        public void Remove(TId idKey)
+        /// <summary>
+        /// Удаление всех значений по Id ключа
+        /// </summary>
+        /// <param name="idKey">Id ключа</param>
+        public void RemoveAll(TId idKey)
         {
-            RemoveItem(idKey);
+            RemoveItems(idKey);
         }
-
-        public void Remove(TName nameKey)
+        /// <summary>
+        /// Удаление всех значений по Name ключа
+        /// </summary>
+        /// <param name="nameKey">Name ключа</param>
+        public void RemoveAll(TName nameKey)
         {
-            RemoveItem(nameKey);
+            RemoveItems(nameKey);
         }
-
+        /// <summary>
+        /// Получение всех значений по Id ключа
+        /// </summary>
+        /// <param name="idKey">Id ключа</param>
+        /// <returns>Коллекция List</returns>
+        /// <exception cref="Exception"></exception>
         public IEnumerable<KeyValuePair<ComplexKey<TId, TName>, TValue>> GetItemsById(TId idKey)
         {
             if (idKey != null)
@@ -65,7 +95,12 @@
 
             throw new Exception("Указанный ключ пустой!");
         }
-
+        /// <summary>
+        /// Получение всех значений по Name ключа
+        /// </summary>
+        /// <param name="nameKey">Name ключа</param>
+        /// <returns>Коллекция List</returns>
+        /// <exception cref="Exception"></exception>
         public IEnumerable<KeyValuePair<ComplexKey<TId, TName>, TValue>> GetItemsByName(TName nameKey)
         {
             if (nameKey != null)
@@ -77,7 +112,12 @@
 
             throw new Exception("Указанный ключ пустой!");
         }
-
+        /// <summary>
+        /// Получение всех значений по Id ключа
+        /// </summary>
+        /// <param name="idKey">Id ключа</param>
+        /// <returns>Массив</returns>
+        /// <exception cref="Exception"></exception>
         public TValue[] GetValuesById(TId idKey)
         {
             if (idKey != null)
@@ -90,7 +130,12 @@
 
             throw new Exception("Указанный ключ пустой!");
         }
-
+        /// <summary>
+        /// Получение всех значений по Name ключа
+        /// </summary>
+        /// <param name="nameKey">Name ключа</param>
+        /// <returns>Массив</returns>
+        /// <exception cref="Exception"></exception>
         public TValue[] GetValuesByName(TName nameKey)
         {
             if (nameKey != null)
@@ -103,7 +148,13 @@
 
             throw new Exception("Указанный ключ пустой!");
         }
-
+        /// <summary>
+        /// Получение значения по Id и Name ключа
+        /// </summary>
+        /// <param name="idKey">Id ключа</param>
+        /// <param name="nameKey">Name ключа</param>
+        /// <returns>Значение из коллекции</returns>
+        /// <exception cref="Exception"></exception>
         public TValue GetValueByKey(TId idKey, TName nameKey)
         {
             if (idKey != null && nameKey != null)
@@ -115,7 +166,12 @@
 
             throw new Exception("Указанный ключ пустой!");
         }
-
+        /// <summary>
+        /// Получение значения по полному ключу
+        /// </summary>
+        /// <param name="complexKey">Полный ключ</param>
+        /// <returns>Значение из коллекции</returns>
+        /// <exception cref="Exception"></exception>
         public TValue GetValueByKey(ComplexKey<TId, TName> complexKey)
         {
             if (ComplexKeyIsNull(complexKey) == false)
@@ -148,7 +204,7 @@
             return false;
         }
 
-        private void RemoveItem(TName nameKey)
+        private void RemoveItems(TName nameKey)
         {
             if (nameKey == null)
             {
@@ -165,7 +221,7 @@
             }
         }
 
-        private void RemoveItem(TId idKey)
+        private void RemoveItems(TId idKey)
         {
             if (idKey == null)
             {
@@ -212,19 +268,13 @@
             }
         }
 
-        private void ChangeItem(ComplexKey<TId, TName> complexKey, TValue value)
-        {
-            mainDictionary.Remove(complexKey);
-            mainDictionary.Add(complexKey, value);
-        }
-
         private void SetValue(ComplexKey<TId, TName> complexKey, TValue value)
         {
             if (ComplexKeyIsNull(complexKey) == false)
             {
                 if (mainDictionary.ContainsKey(complexKey))
                 {
-                    ChangeItem(complexKey, value);
+                    mainDictionary[complexKey] = value;
                 }
                 else
                 {
