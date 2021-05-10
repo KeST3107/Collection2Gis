@@ -1,7 +1,6 @@
 ﻿namespace Collection2Gis
 {
     using System;
-    using System.Collections.Generic;
 
     internal class Program
     {

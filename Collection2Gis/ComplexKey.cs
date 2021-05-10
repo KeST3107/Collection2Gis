@@ -25,16 +25,20 @@
 
         public bool Equals(ComplexKey<TId, TName> other)
         {
-            if (other == null) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if (other == null)
+                return false;
+            if (ReferenceEquals(this, other))
+                return true;
 
             return Id.Equals(other.Id) && Name.Equals(other.Name);
         }
 
         public override bool Equals(object obj)
         {
-            if (obj == null) return false;
-            if (ReferenceEquals(this, obj)) return true;
+            if (obj == null)
+                return false;
+            if (ReferenceEquals(this, obj))
+                return true;
             return obj is ComplexKey<TId, TName> key && Equals(key);
         }
 
@@ -42,7 +46,10 @@
         {
             unchecked
             {
-                return Id.GetHashCode() * 397 ^ Name.GetHashCode();
+                int hash = 17;
+                hash = hash * 23 + Id.GetHashCode();
+                hash = hash * 23 + Name.GetHashCode();
+                return hash;
             }
         }
 

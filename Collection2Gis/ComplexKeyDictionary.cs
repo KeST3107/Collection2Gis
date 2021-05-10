@@ -7,6 +7,8 @@
 
     public sealed class ComplexKeyDictionary<TId, TName, TValue> : IEnumerable<TValue>
     {
+        private readonly object locker = new object();
+
         private readonly Dictionary<ComplexKey<TId, TName>, TValue> mainDictionary =
             new Dictionary<ComplexKey<TId, TName>, TValue>();
 
@@ -22,6 +24,7 @@
 
             set => SetValue(new ComplexKey<TId, TName>(id, name), value);
         }
+
         /// <summary>
         /// Добавление значения по полному ключу
         /// </summary>
@@ -30,6 +33,7 @@
         {
             AddItem(value.Key, value.Value);
         }
+
         /// <summary>
         /// Добавление значения по полному ключу
         /// </summary>
@@ -39,13 +43,18 @@
         {
             AddItem(complexKey, value);
         }
+
         /// <summary>
         /// Очистка коллекции
         /// </summary>
         public void ClearAll()
         {
-            mainDictionary.Clear();
+            lock (locker)
+            {
+                mainDictionary.Clear();
+            }
         }
+
         /// <summary>
         /// Удаление значения по полному ключу
         /// </summary>
@@ -54,6 +63,7 @@
         {
             RemoveItem(value.Key);
         }
+
         /// <summary>
         /// Удаление значения по полному ключу
         /// </summary>
@@ -62,6 +72,7 @@
         {
             RemoveItem(complexKey);
         }
+
         /// <summary>
         /// Удаление всех значений по Id ключа
         /// </summary>
@@ -70,6 +81,7 @@
         {
             RemoveItems(idKey);
         }
+
         /// <summary>
         /// Удаление всех значений по Name ключа
         /// </summary>
@@ -78,6 +90,7 @@
         {
             RemoveItems(nameKey);
         }
+
         /// <summary>
         /// Получение всех значений по Id ключа
         /// </summary>
@@ -95,6 +108,7 @@
 
             throw new Exception("Указанный ключ пустой!");
         }
+
         /// <summary>
         /// Получение всех значений по Name ключа
         /// </summary>
@@ -112,6 +126,7 @@
 
             throw new Exception("Указанный ключ пустой!");
         }
+
         /// <summary>
         /// Получение всех значений по Id ключа
         /// </summary>
@@ -130,6 +145,7 @@
 
             throw new Exception("Указанный ключ пустой!");
         }
+
         /// <summary>
         /// Получение всех значений по Name ключа
         /// </summary>
@@ -148,6 +164,7 @@
 
             throw new Exception("Указанный ключ пустой!");
         }
+
         /// <summary>
         /// Получение значения по Id и Name ключа
         /// </summary>
@@ -166,6 +183,7 @@
 
             throw new Exception("Указанный ключ пустой!");
         }
+
         /// <summary>
         /// Получение значения по полному ключу
         /// </summary>
@@ -211,13 +229,17 @@
                 throw new ArgumentNullException(nameof(nameKey));
             }
 
-            var items = mainDictionary
-                .Where(x => x.Key.Name.Equals(nameKey))
-                .Select(x => x.Key)
-                .ToArray();
-            foreach (var e in items)
+            lock (locker)
             {
-                mainDictionary.Remove(e);
+                var items = mainDictionary
+                    .Where(x => x.Key.Name.Equals(nameKey))
+                    .Select(x => x.Key)
+                    .ToArray();
+
+                foreach (var e in items)
+                {
+                    mainDictionary.Remove(e);
+                }
             }
         }
 
@@ -228,13 +250,17 @@
                 throw new ArgumentNullException(nameof(idKey));
             }
 
-            var items = mainDictionary
-                .Where(x => x.Key.Id.Equals(idKey))
-                .Select(x => x.Key)
-                .ToArray();
-            foreach (var e in items)
+            lock (locker)
             {
-                mainDictionary.Remove(e);
+                var items = mainDictionary
+                    .Where(x => x.Key.Id.Equals(idKey))
+                    .Select(x => x.Key)
+                    .ToArray();
+
+                foreach (var e in items)
+                {
+                    mainDictionary.Remove(e);
+                }
             }
         }
 
@@ -244,7 +270,10 @@
             {
                 if (mainDictionary.ContainsKey(complexKey))
                 {
-                    mainDictionary.Remove(complexKey);
+                    lock (locker)
+                    {
+                        mainDictionary.Remove(complexKey);
+                    }
                 }
                 else
                 {
@@ -263,7 +292,10 @@
                 }
                 else
                 {
-                    mainDictionary.Add(complexKey, value);
+                    lock (locker)
+                    {
+                        mainDictionary.Add(complexKey, value);
+                    }
                 }
             }
         }
@@ -274,7 +306,10 @@
             {
                 if (mainDictionary.ContainsKey(complexKey))
                 {
-                    mainDictionary[complexKey] = value;
+                    lock (locker)
+                    {
+                        mainDictionary[complexKey] = value;
+                    }
                 }
                 else
                 {
