@@ -43,7 +43,16 @@
         {
             AddItem(complexKey, value);
         }
-
+        /// <summary>
+        /// Добавление значения по составному ключу и значению
+        /// </summary>
+        /// <param name="id">ID ключа</param>
+        /// <param name="name">NAME ключа</param>
+        /// <param name="value">Значение</param>
+        public void Add(TId id, TName name, TValue value)
+        {
+            Add(new ComplexKey<TId, TName>(id, name), value);
+        }
         /// <summary>
         /// Очистка коллекции
         /// </summary>
@@ -70,6 +79,16 @@
         /// <param name="complexKey">Ключ</param>
         public void Remove(ComplexKey<TId, TName> complexKey)
         {
+            RemoveItem(complexKey);
+        }
+
+        /// <summary>
+        /// Удаление значения по полному ключу
+        /// </summary>
+        /// <param name="complexKey">Ключ</param>
+        public void Remove(TId id, TName name)
+        {
+            var complexKey = new ComplexKey<TId, TName>(id, name);
             RemoveItem(complexKey);
         }
 
