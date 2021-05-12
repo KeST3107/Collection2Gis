@@ -1,6 +1,7 @@
 ﻿namespace Collection2Gis
 {
     using System;
+    using Collection2Gis.Dictionary;
 
     internal class Program
     {

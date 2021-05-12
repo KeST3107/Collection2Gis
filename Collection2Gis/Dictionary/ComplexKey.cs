@@ -1,4 +1,4 @@
-﻿namespace Collection2Gis
+﻿namespace Collection2Gis.Dictionary
 {
     using System;
 
