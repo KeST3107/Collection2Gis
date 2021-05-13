@@ -104,7 +104,7 @@
         /// Удаление всех значений по Id ключа
         /// </summary>
         /// <param name="idKey">Id ключа</param>
-        public void RemoveAll(TId idKey)
+        public void RemoveById(TId idKey)
         {
             RemoveItems(idKey);
         }
@@ -113,7 +113,7 @@
         /// Удаление всех значений по Name ключа
         /// </summary>
         /// <param name="nameKey">Name ключа</param>
-        public void RemoveAll(TName nameKey)
+        public void RemoveByName(TName nameKey)
         {
             RemoveItems(nameKey);
         }
@@ -124,7 +124,7 @@
         /// <param name="idKey">Id ключа</param>
         /// <returns>Коллекция List</returns>
         /// <exception cref="Exception"></exception>
-        public List<TValue> GetItemsById(TId idKey)
+        public List<TValue> GetValuesById(TId idKey)
         {
             if (idKey != null)
             {
@@ -145,7 +145,7 @@
         /// <param name="nameKey">Name ключа</param>
         /// <returns>Коллекция List</returns>
         /// <exception cref="Exception"></exception>
-        public List<TValue> GetItemsByName(TName nameKey)
+        public List<TValue> GetValuesByName(TName nameKey)
         {
             if (nameKey != null)
             {
@@ -343,8 +343,11 @@
             {
                 idValue.Add(value);
             }
+            else
+            {
+                dictionary.Add(key, new List<TValue> {value});
+            }
 
-            dictionary.Add(key, new List<TValue> {value});
         }
 
         private TValue GetValue(ComplexKey<TId, TName> complexKey)
