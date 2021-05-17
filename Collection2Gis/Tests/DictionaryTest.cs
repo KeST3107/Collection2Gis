@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.Threading;
-    using System.Threading.Tasks;
     using Collection2Gis.Dictionary;
     using NUnit.Framework;
 
@@ -31,11 +30,13 @@
             {
                 { "102", "Konstantin", 1 },
             };
+            var keyValuePair = new KeyValuePair<ComplexKey<string, string>, int>(new ComplexKey<string, string>("102", "Petya"), 2);
             var complexKey = new ComplexKey<string, string>("115", "Konstantin");
             var value = 3;
-            var keyValuePair = new KeyValuePair<ComplexKey<string, string>, int>(new ComplexKey<string, string>("102", "Petya"), 2);
-            complexKeyDictionary.Add(complexKey, value);
+
             complexKeyDictionary.Add(keyValuePair);
+            complexKeyDictionary.Add(complexKey, value);
+
 
             Assert.That(complexKeyDictionary.Count, Is.EqualTo(3));
         }
@@ -239,20 +240,13 @@
             Assert.That(iterations, Is.EqualTo(5));
         }
 
-
-
-
-
-
-
-
         [Test]
         public void DuplicatesIdTest()
         {
             var complexKeyDictionary = new ComplexKeyDictionary<string, string, int>
             {
-                { "Id1", "Name1", 1 },
-                { "Id1", "Name2", 2 },
+                { "102", "Konstantin", 1 },
+                { "102", "Petya", 2 },
             };
 
             var dictionaryCount = complexKeyDictionary.Count();
@@ -260,7 +254,7 @@
             var isExceptionThrown = false;
             try
             {
-                complexKeyDictionary.Add("Id1", "Name1", 3);
+                complexKeyDictionary.Add("102", "Konstantin", 1);
             }
             catch (Exception e)
             {
@@ -276,22 +270,28 @@
         {
             var complexKeyDictionary = new ComplexKeyDictionary<string, string, int>
             {
-                {"Id1", "Name1", 1},
-                {"Id1", "Name2", 2},
-                {"Id2", "Name1", 3},
-                {"Id2", "Name2", 4},
-                {"Id3", "Name1", 5}
+                { "101", "Konstantin", 1 },
+                { "102", "Petya", 2 },
+                { "103", "Vladimir", 3 },
+                { "104", "Nikolay", 4 },
+                { "105", "TestName", 5 }
             };
-
             var initCount = complexKeyDictionary.Count();
 
-            Task.Run(() => complexKeyDictionary.Add("TId1", "TName1", 6));
-            Task.Run(() => complexKeyDictionary.Add("TId2", "TName2", 7));
-            Task.Run(() => complexKeyDictionary.Add("TId3", "TName3", 8));
+            ThreadWithState firstThreadWithState = new ThreadWithState("115", "Ilay", 6,complexKeyDictionary);
+            ThreadWithState secondThreadWithState = new ThreadWithState("116", "Bilain", 7,complexKeyDictionary);
+            ThreadWithState thirdThreadWithState = new ThreadWithState("117", "Bezya", 8,complexKeyDictionary);
+
+            Thread firstThread = new Thread(firstThreadWithState.ThreadProc);
+            Thread secondThread = new Thread(secondThreadWithState.ThreadProc);
+            Thread thirdThread = new Thread(thirdThreadWithState.ThreadProc);
+            firstThread.Start();
+            secondThread.Start();
+            thirdThread.Start();
 
             Thread.Sleep(10);
-
             Assert.AreEqual(initCount + 3, complexKeyDictionary.Count());
         }
+
     }
 }

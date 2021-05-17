@@ -64,12 +64,14 @@
         /// </summary>
         public void ClearAll()
         {
+            Console.WriteLine("Поток блокирован");
             lock (locker)
             {
                 mainDictionary.Clear();
                 idDictionary.Clear();
                 nameDictionary.Clear();
             }
+            Console.WriteLine("Поток разблокирован");
         }
 
         /// <summary>
@@ -223,7 +225,7 @@
             {
                 throw new ArgumentNullException(nameof(nameKey));
             }
-
+            Console.WriteLine("Поток блокирован");
             lock (locker)
             {
                 var complexKeys = mainDictionary
@@ -238,6 +240,7 @@
 
                 RemoveItemPartionalDictionary(nameDictionary, nameKey);
             }
+            Console.WriteLine("Поток разблокирован");
         }
 
         private void RemoveItems(TId idKey)
@@ -246,7 +249,7 @@
             {
                 throw new ArgumentNullException(nameof(idKey));
             }
-
+            Console.WriteLine("Поток блокирован");
             lock (locker)
             {
                 var complexKeys = mainDictionary
@@ -261,6 +264,7 @@
 
                 RemoveItemPartionalDictionary(idDictionary, idKey);
             }
+            Console.WriteLine("Поток разблокирован");
         }
 
         private void RemoveItem(ComplexKey<TId, TName> complexKey)
@@ -269,12 +273,14 @@
             {
                 if (mainDictionary.ContainsKey(complexKey))
                 {
+                    Console.WriteLine("Поток блокирован");
                     lock (locker)
                     {
                         mainDictionary.Remove(complexKey);
                         RemoveItemPartionalDictionary(idDictionary, complexKey.Id);
                         RemoveItemPartionalDictionary(nameDictionary, complexKey.Name);
                     }
+                    Console.WriteLine("Поток разблокирован");
                 }
                 else
                 {
@@ -299,13 +305,14 @@
                 {
                     throw new Exception("Запись с данным ключем уже имеется!");
                 }
-
+                Console.WriteLine("Поток блокирован");
                 lock (locker)
                 {
                     mainDictionary.Add(complexKey, value);
                     AddItemPartionalDictionary(idDictionary, complexKey.Id, value);
                     AddItemPartionalDictionary(nameDictionary, complexKey.Name, value);
                 }
+                Console.WriteLine("Поток разблокирован");
 
             }
         }
@@ -316,16 +323,23 @@
             {
                 if (mainDictionary.ContainsKey(complexKey))
                 {
+                    Console.WriteLine("Поток блокирован");
                     lock (locker)
                     {
                         mainDictionary[complexKey] = value;
                         AddItemPartionalDictionary(idDictionary, complexKey.Id, value);
                         AddItemPartionalDictionary(nameDictionary, complexKey.Name, value);
                     }
+                    Console.WriteLine("Поток разблокирован");
                 }
                 else
                 {
-                    AddItem(complexKey, value);
+                    Console.WriteLine("Поток блокирован");
+                    lock (locker)
+                    {
+                        AddItem(complexKey, value);
+                    }
+                    Console.WriteLine("Поток разблокирован");
                 }
             }
         }

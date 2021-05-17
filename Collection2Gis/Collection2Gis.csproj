@@ -49,6 +49,7 @@
         <Compile Include="Program.cs" />
         <Compile Include="Tests\ComplexKeyTest.cs" />
         <Compile Include="Tests\DictionaryTest.cs" />
+        <Compile Include="Tests\ThreadWithState.cs" />
     </ItemGroup>
     <ItemGroup>
       <Folder Include="Properties" />
