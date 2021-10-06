@@ -12,6 +12,10 @@
         private readonly Dictionary<ComplexKey<TId, TName>, TValue> mainDictionary =
             new Dictionary<ComplexKey<TId, TName>, TValue>();
 
+        private readonly Dictionary<TId, List<TValue>> idDictionary = new Dictionary<TId, List<TValue>>();
+
+        private readonly Dictionary<TName, List<TValue>> nameDictionary = new Dictionary<TName, List<TValue>>();
+
         /// <summary>
         /// Получение количества значений в коллекции
         /// </summary>
@@ -43,6 +47,7 @@
         {
             AddItem(complexKey, value);
         }
+
         /// <summary>
         /// Добавление значения по составному ключу и значению
         /// </summary>
@@ -53,15 +58,20 @@
         {
             Add(new ComplexKey<TId, TName>(id, name), value);
         }
+
         /// <summary>
         /// Очистка коллекции
         /// </summary>
         public void ClearAll()
         {
+            Console.WriteLine("Поток блокирован");
             lock (locker)
             {
                 mainDictionary.Clear();
+                idDictionary.Clear();
+                nameDictionary.Clear();
             }
+            Console.WriteLine("Поток разблокирован");
         }
 
         /// <summary>
@@ -96,7 +106,7 @@
         /// Удаление всех значений по Id ключа
         /// </summary>
         /// <param name="idKey">Id ключа</param>
-        public void RemoveAll(TId idKey)
+        public void RemoveById(TId idKey)
         {
             RemoveItems(idKey);
         }
@@ -105,7 +115,7 @@
         /// Удаление всех значений по Name ключа
         /// </summary>
         /// <param name="nameKey">Name ключа</param>
-        public void RemoveAll(TName nameKey)
+        public void RemoveByName(TName nameKey)
         {
             RemoveItems(nameKey);
         }
@@ -116,16 +126,19 @@
         /// <param name="idKey">Id ключа</param>
         /// <returns>Коллекция List</returns>
         /// <exception cref="Exception"></exception>
-        public IEnumerable<KeyValuePair<ComplexKey<TId, TName>, TValue>> GetItemsById(TId idKey)
+        public List<TValue> GetValuesById(TId idKey)
         {
             if (idKey != null)
             {
-                return mainDictionary
-                    .Where(item => item.Key.Id.Equals(idKey))
-                    .ToList();
+                if (idDictionary.ContainsKey(idKey))
+                {
+                    return idDictionary[idKey];
+                }
+
+                throw new Exception($"Данного ключа нет в коллекции {nameof(idDictionary)}");
             }
 
-            throw new Exception("Указанный ключ пустой!");
+            throw new ArgumentNullException(nameof(idKey));
         }
 
         /// <summary>
@@ -134,54 +147,19 @@
         /// <param name="nameKey">Name ключа</param>
         /// <returns>Коллекция List</returns>
         /// <exception cref="Exception"></exception>
-        public IEnumerable<KeyValuePair<ComplexKey<TId, TName>, TValue>> GetItemsByName(TName nameKey)
+        public List<TValue> GetValuesByName(TName nameKey)
         {
             if (nameKey != null)
             {
-                return mainDictionary
-                    .Where(item => item.Key.Name.Equals(nameKey))
-                    .ToList();
+                if (nameDictionary.ContainsKey(nameKey))
+                {
+                    return nameDictionary[nameKey];
+                }
+
+                throw new Exception($"Данного ключа нет в коллекции {nameof(nameDictionary)}");
             }
 
-            throw new Exception("Указанный ключ пустой!");
-        }
-
-        /// <summary>
-        /// Получение всех значений по Id ключа
-        /// </summary>
-        /// <param name="idKey">Id ключа</param>
-        /// <returns>Массив</returns>
-        /// <exception cref="Exception"></exception>
-        public TValue[] GetValuesById(TId idKey)
-        {
-            if (idKey != null)
-            {
-                return mainDictionary
-                    .Where(item => item.Key.Id.Equals(idKey))
-                    .Select(x => x.Value)
-                    .ToArray();
-            }
-
-            throw new Exception("Указанный ключ пустой!");
-        }
-
-        /// <summary>
-        /// Получение всех значений по Name ключа
-        /// </summary>
-        /// <param name="nameKey">Name ключа</param>
-        /// <returns>Массив</returns>
-        /// <exception cref="Exception"></exception>
-        public TValue[] GetValuesByName(TName nameKey)
-        {
-            if (nameKey != null)
-            {
-                return mainDictionary
-                    .Where(item => item.Key.Name.Equals(nameKey))
-                    .Select(x => x.Value)
-                    .ToArray();
-            }
-
-            throw new Exception("Указанный ключ пустой!");
+            throw new ArgumentNullException(nameof(nameKey));
         }
 
         /// <summary>
@@ -247,19 +225,22 @@
             {
                 throw new ArgumentNullException(nameof(nameKey));
             }
-
+            Console.WriteLine("Поток блокирован");
             lock (locker)
             {
-                var items = mainDictionary
+                var complexKeys = mainDictionary
                     .Where(x => x.Key.Name.Equals(nameKey))
                     .Select(x => x.Key)
                     .ToArray();
 
-                foreach (var e in items)
+                foreach (var key in complexKeys)
                 {
-                    mainDictionary.Remove(e);
+                    mainDictionary.Remove(key);
                 }
+
+                RemoveItemPartionalDictionary(nameDictionary, nameKey);
             }
+            Console.WriteLine("Поток разблокирован");
         }
 
         private void RemoveItems(TId idKey)
@@ -268,19 +249,22 @@
             {
                 throw new ArgumentNullException(nameof(idKey));
             }
-
+            Console.WriteLine("Поток блокирован");
             lock (locker)
             {
-                var items = mainDictionary
+                var complexKeys = mainDictionary
                     .Where(x => x.Key.Id.Equals(idKey))
                     .Select(x => x.Key)
                     .ToArray();
 
-                foreach (var e in items)
+                foreach (var key in complexKeys)
                 {
-                    mainDictionary.Remove(e);
+                    mainDictionary.Remove(key);
                 }
+
+                RemoveItemPartionalDictionary(idDictionary, idKey);
             }
+            Console.WriteLine("Поток разблокирован");
         }
 
         private void RemoveItem(ComplexKey<TId, TName> complexKey)
@@ -289,15 +273,27 @@
             {
                 if (mainDictionary.ContainsKey(complexKey))
                 {
+                    Console.WriteLine("Поток блокирован");
                     lock (locker)
                     {
                         mainDictionary.Remove(complexKey);
+                        RemoveItemPartionalDictionary(idDictionary, complexKey.Id);
+                        RemoveItemPartionalDictionary(nameDictionary, complexKey.Name);
                     }
+                    Console.WriteLine("Поток разблокирован");
                 }
                 else
                 {
                     throw new Exception("Запись с данным ключем не найдена!");
                 }
+            }
+        }
+
+        private void RemoveItemPartionalDictionary<T>(Dictionary<T, List<TValue>> dictionary, T key)
+        {
+            if (dictionary.ContainsKey(key))
+            {
+                dictionary.Remove(key);
             }
         }
 
@@ -309,13 +305,15 @@
                 {
                     throw new Exception("Запись с данным ключем уже имеется!");
                 }
-                else
+                Console.WriteLine("Поток блокирован");
+                lock (locker)
                 {
-                    lock (locker)
-                    {
-                        mainDictionary.Add(complexKey, value);
-                    }
+                    mainDictionary.Add(complexKey, value);
+                    AddItemPartionalDictionary(idDictionary, complexKey.Id, value);
+                    AddItemPartionalDictionary(nameDictionary, complexKey.Name, value);
                 }
+                Console.WriteLine("Поток разблокирован");
+
             }
         }
 
@@ -325,16 +323,45 @@
             {
                 if (mainDictionary.ContainsKey(complexKey))
                 {
+                    Console.WriteLine("Поток блокирован");
                     lock (locker)
                     {
                         mainDictionary[complexKey] = value;
+                        AddItemPartionalDictionary(idDictionary, complexKey.Id, value);
+                        AddItemPartionalDictionary(nameDictionary, complexKey.Name, value);
                     }
+                    Console.WriteLine("Поток разблокирован");
                 }
                 else
                 {
-                    AddItem(complexKey, value);
+                    Console.WriteLine("Поток блокирован");
+                    lock (locker)
+                    {
+                        AddItem(complexKey, value);
+                    }
+                    Console.WriteLine("Поток разблокирован");
                 }
             }
+        }
+
+        /// <summary>
+        /// Дженерик метод для добавления значения по ID или NAME ключу
+        /// </summary>
+        /// <param name="dictionary">Коллекция в которую нужно занести значение</param>
+        /// <param name="key">ID или NAME</param>
+        /// <param name="value">Значение</param>
+        /// <typeparam name="T">Уазываемый тип TId или TName</typeparam>
+        private void AddItemPartionalDictionary<T>(Dictionary<T, List<TValue>> dictionary, T key, TValue value)
+        {
+            if (dictionary.TryGetValue(key, out var idValue))
+            {
+                idValue.Add(value);
+            }
+            else
+            {
+                dictionary.Add(key, new List<TValue> {value});
+            }
+
         }
 
         private TValue GetValue(ComplexKey<TId, TName> complexKey)
