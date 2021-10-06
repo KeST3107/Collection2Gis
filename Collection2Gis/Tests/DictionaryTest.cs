@@ -256,7 +256,7 @@
             {
                 complexKeyDictionary.Add("102", "Konstantin", 1);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 isExceptionThrown = true;
             }
