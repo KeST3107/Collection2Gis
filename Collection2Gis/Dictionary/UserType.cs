@@ -1,7 +1,7 @@
-﻿namespace Collection2Gis.Dictionary
-{
-    using System;
+﻿using System;
 
+namespace Collection2Gis.Dictionary
+{
     public class UserType : IEquatable<UserType>
     {
         public long UserId;
@@ -22,14 +22,14 @@
                 return false;
             if (obj.GetType() != GetType())
                 return false;
-            return Equals((UserType) obj);
+            return Equals((UserType)obj);
         }
 
         public override int GetHashCode()
         {
             unchecked
             {
-                int hash = 17;
+                var hash = 17;
                 hash = hash * 23 + UserId.GetHashCode();
                 hash = hash * 23 + UserName.GetHashCode();
                 return hash;

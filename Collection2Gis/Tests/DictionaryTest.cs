@@ -1,11 +1,11 @@
-﻿namespace Collection2Gis.Tests
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Threading;
-    using Collection2Gis.Dictionary;
-    using NUnit.Framework;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
+using Collection2Gis.Dictionary;
+using NUnit.Framework;
 
+namespace Collection2Gis.Tests
+{
     [TestFixture]
     public class DictionaryTest
     {
@@ -28,9 +28,10 @@
         {
             var complexKeyDictionary = new ComplexKeyDictionary<string, string, int>
             {
-                { "102", "Konstantin", 1 },
+                { "102", "Konstantin", 1 }
             };
-            var keyValuePair = new KeyValuePair<ComplexKey<string, string>, int>(new ComplexKey<string, string>("102", "Petya"), 2);
+            var keyValuePair =
+                new KeyValuePair<ComplexKey<string, string>, int>(new ComplexKey<string, string>("102", "Petya"), 2);
             var complexKey = new ComplexKey<string, string>("115", "Konstantin");
             var value = 3;
 
@@ -89,7 +90,8 @@
                 { "105", "Nikolay", 4 },
                 { "100", "TestName", 5 }
             };
-            complexKeyDictionary.Remove(new KeyValuePair<ComplexKey<string, string>, int>(new ComplexKey<string, string>("102", "Petya"), 2));
+            complexKeyDictionary.Remove(
+                new KeyValuePair<ComplexKey<string, string>, int>(new ComplexKey<string, string>("102", "Petya"), 2));
 
             Assert.That(complexKeyDictionary.Count, Is.EqualTo(4));
         }
@@ -214,7 +216,7 @@
             };
             var value = 3;
 
-            Assert.That(complexKeyDictionary.GetValueByKey("105","Konstantin"), Is.EqualTo(value));
+            Assert.That(complexKeyDictionary.GetValueByKey("105", "Konstantin"), Is.EqualTo(value));
         }
 
 
@@ -232,10 +234,7 @@
 
             var iterations = 0;
 
-            foreach (var value in complexKeyDictionary)
-            {
-                iterations++;
-            }
+            foreach (var value in complexKeyDictionary) iterations++;
 
             Assert.That(iterations, Is.EqualTo(5));
         }
@@ -246,7 +245,7 @@
             var complexKeyDictionary = new ComplexKeyDictionary<string, string, int>
             {
                 { "102", "Konstantin", 1 },
-                { "102", "Petya", 2 },
+                { "102", "Petya", 2 }
             };
 
             var dictionaryCount = complexKeyDictionary.Count();
@@ -278,13 +277,13 @@
             };
             var initCount = complexKeyDictionary.Count();
 
-            ThreadWithState firstThreadWithState = new ThreadWithState("115", "Ilay", 6,complexKeyDictionary);
-            ThreadWithState secondThreadWithState = new ThreadWithState("116", "Bilain", 7,complexKeyDictionary);
-            ThreadWithState thirdThreadWithState = new ThreadWithState("117", "Bezya", 8,complexKeyDictionary);
+            var firstThreadWithState = new ThreadWithState("115", "Ilay", 6, complexKeyDictionary);
+            var secondThreadWithState = new ThreadWithState("116", "Bilain", 7, complexKeyDictionary);
+            var thirdThreadWithState = new ThreadWithState("117", "Bezya", 8, complexKeyDictionary);
 
-            Thread firstThread = new Thread(firstThreadWithState.ThreadProc);
-            Thread secondThread = new Thread(secondThreadWithState.ThreadProc);
-            Thread thirdThread = new Thread(thirdThreadWithState.ThreadProc);
+            var firstThread = new Thread(firstThreadWithState.ThreadProc);
+            var secondThread = new Thread(secondThreadWithState.ThreadProc);
+            var thirdThread = new Thread(thirdThreadWithState.ThreadProc);
             firstThread.Start();
             secondThread.Start();
             thirdThread.Start();
@@ -292,6 +291,5 @@
             Thread.Sleep(10);
             Assert.AreEqual(initCount + 3, complexKeyDictionary.Count());
         }
-
     }
 }
