@@ -1,17 +1,14 @@
-﻿namespace Collection2Gis.Tests
-{
-    using System;
-    using Collection2Gis.Dictionary;
+﻿using System;
+using Collection2Gis.Dictionary;
 
+namespace Collection2Gis.Tests
+{
     public class ThreadWithState
     {
-        // State information used in the task.
-        private string Id;
-        private string Name;
-        private int Value;
-        public ComplexKeyDictionary<string, string, int> Dictionary { get; set; }
+        private readonly string Id;
+        private readonly string Name;
+        private readonly int Value;
 
-        // The constructor obtains the state information.
         public ThreadWithState(string id, string name, int value, ComplexKeyDictionary<string, string, int> dictionary)
         {
             Id = id;
@@ -20,8 +17,8 @@
             Dictionary = dictionary;
         }
 
-        // The thread procedure performs the task, such as formatting
-        // and printing a document.
+        public ComplexKeyDictionary<string, string, int> Dictionary { get; set; }
+
         public void ThreadProc()
         {
             Dictionary.Add(Id, Name, Value);

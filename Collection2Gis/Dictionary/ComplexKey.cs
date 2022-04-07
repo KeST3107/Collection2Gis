@@ -1,27 +1,21 @@
-﻿namespace Collection2Gis.Dictionary
-{
-    using System;
+﻿using System;
 
+namespace Collection2Gis.Dictionary
+{
     public sealed class ComplexKey<TId, TName> : IEquatable<ComplexKey<TId, TName>>
     {
-        public TId Id { get; }
-        public TName Name { get; }
-
         public ComplexKey(TId id, TName name)
         {
-            if (id == null)
-            {
-                throw new ArgumentNullException(nameof(id));
-            }
+            if (id == null) throw new ArgumentNullException(nameof(id));
 
-            if (name == null)
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
+            if (name == null) throw new ArgumentNullException(nameof(name));
 
             Id = id;
             Name = name;
         }
+
+        public TId Id { get; }
+        public TName Name { get; }
 
         public bool Equals(ComplexKey<TId, TName> other)
         {
@@ -46,7 +40,7 @@
         {
             unchecked
             {
-                int hash = 17;
+                var hash = 17;
                 hash = hash * 23 + Id.GetHashCode();
                 hash = hash * 23 + Name.GetHashCode();
                 return hash;

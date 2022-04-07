@@ -1,7 +1,7 @@
-﻿namespace Collection2Gis
-{
-    using Collection2Gis.Dictionary;
+﻿using Collection2Gis.Dictionary;
 
+namespace Collection2Gis
+{
     internal class Program
     {
         public static void Main(string[] args)
